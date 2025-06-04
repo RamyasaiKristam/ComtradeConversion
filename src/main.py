@@ -11,7 +11,7 @@ def load_config(config_path):
 
 def main():
     # Load configuration
-    config = load_config('../config.yaml')
+    #config = load_config('../config.yaml')
     connection_string = os.getenv('AZURE_CONNECTION_STRING', config['blob_storage']['connection_string'])
     input_container = os.getenv('AZURE_SOURCE_CONTAINER', config['blob_storage']['source_container'])
     output_container = os.getenv('AZURE_DESTINATION_CONTAINER', config['blob_storage']['destination_container'])
