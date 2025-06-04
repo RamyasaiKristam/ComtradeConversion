@@ -44,4 +44,5 @@ jobs:
       env:
         AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
       run: |
-        python src/main.py
+        cd src
+        python main.py
