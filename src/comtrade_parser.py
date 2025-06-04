@@ -10,6 +10,9 @@ def parse_cfg(cfg_content):
 
     lines = [line.strip() for line in cfg_content.splitlines()]
 
+    # Skip the first 2 lines (header info)
+    channel_lines = lines[2:]
+
     channel_end = 0
     for i, line in enumerate(lines):
         parts = line.split(',')
