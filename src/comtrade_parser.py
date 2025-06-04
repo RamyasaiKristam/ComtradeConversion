@@ -14,11 +14,11 @@ def parse_cfg(cfg_content):
     channel_lines = lines[2:]
 
     channel_end = 0
-    for i, line in enumerate(lines):
+    for i, line in enumerate(channel_lines):
         parts = line.split(',')
         if len(parts) >= 3 and parts[0].isdigit():
             channel_end = i
-
+    
     # Adjust for the skipped lines
     channel_end += 2
 
