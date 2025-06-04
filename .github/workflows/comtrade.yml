@@ -2,15 +2,15 @@ name: Weekly Comtrade Data Processing
 
 on:
   schedule:
-    - cron: '0 0 * * 0'  # Runs every Sunday at midnight UTC
-  workflow_dispatch:      # Allows manual trigger from GitHub
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
 
 jobs:
   run:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write       # Required for OIDC login to Azure
-      contents: read        # Required to checkout the code
+      id-token: write
+      contents: read
 
     steps:
     - name: Checkout repo
@@ -29,6 +29,7 @@ jobs:
     - name: Debug OIDC subject
       run: |
         echo "Subject: repo:${{ github.repository }}:ref:${{ github.ref }}"
+
     - name: Azure login
       uses: azure/login@v2
       with:
@@ -36,9 +37,11 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+    - name: Verify Azure login
+      run: az account show
+
     - name: Run the pipeline
       env:
         AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-
       run: |
         python src/main.py
