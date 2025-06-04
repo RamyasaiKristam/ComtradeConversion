@@ -1,0 +1,4 @@
+blob_storage:
+  source_container: "cfgdat"
+  destination_container: "csv"
+  
