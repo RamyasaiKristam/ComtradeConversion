@@ -4,20 +4,28 @@ from blob_utils import list_blob_files, download_blob, upload_blob
 from comtrade_parser import parse_cfg, parse_dat
 from csv_writer import write_csv
 import os
+from azure.identity import DefaultAzureCredential
 
-# def load_config(config_path):
-#     with open(config_path, 'r') as file:
-#         return yaml.safe_load(file)
+def load_config(config_path):
+    with open(config_path, 'r') as file:
+        return yaml.safe_load(file)
 
 def main():
     # Load configuration
-    #config = load_config('../config.yaml')
+    config = load_config("config.yaml")
     connection_string = os.getenv('AZURE_CONNECTION_STRING')
     input_container = os.getenv('AZURE_SOURCE_CONTAINER')
     output_container = os.getenv('AZURE_DESTINATION_CONTAINER')
 
     # Set up blob clients
-    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+    input_container = config["blob_storage"]["source_container"]
+    output_container = config["blob_storage"]["destination_container"]
+    account_name = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
+    account_url = f"https://{account_name}.blob.core.windows.net"
+    default_credential = DefaultAzureCredential()
+ 
+    # Create the BlobServiceClient object
+    blob_service_client = BlobServiceClient(account_url, credential=default_credential)
     input_container_client = blob_service_client.get_container_client(input_container)
     output_container_client = blob_service_client.get_container_client(output_container)
     print("connected successfully to Azure Blob Storage")
