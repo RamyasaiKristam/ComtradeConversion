@@ -1,0 +1,4 @@
+azure-storage-blob
+pyyaml
+numpy
+pandas
