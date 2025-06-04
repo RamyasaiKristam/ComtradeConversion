@@ -19,13 +19,16 @@ def parse_cfg(cfg_content):
         if len(parts) >= 3 and parts[0].isdigit():
             channel_end = i
 
+    # Adjust for the skipped lines
+    channel_end += 2
+
     total_channels = int(lines[channel_end + 1])
     nrates = int(lines[channel_end + 2])
     metadata['nrates'] = nrates
 
     for i in range(nrates):
         parts = lines[channel_end + 3 + i].split(',')
-        if len(parts) >= 2:
+        if len(parts) == 2:
             sampling_rates.append((float(parts[0]), int(parts[1])))
     metadata['sampling_rates'] = sampling_rates
 
