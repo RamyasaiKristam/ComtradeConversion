@@ -5,9 +5,9 @@ from comtrade_parser import parse_cfg, parse_dat
 from csv_writer import write_csv
 import os
 
-def load_config(config_path):
-    with open(config_path, 'r') as file:
-        return yaml.safe_load(file)
+# def load_config(config_path):
+#     with open(config_path, 'r') as file:
+#         return yaml.safe_load(file)
 
 def main():
     # Load configuration
