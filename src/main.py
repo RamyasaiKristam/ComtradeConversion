@@ -43,7 +43,10 @@ def main():
             output_time = output_blobs[output_blob].last_modified if output_blob in output_blobs else None
             # Process if output doesn't exist or is older than either input
             if (output_time is None) or (output_time < cfg_time) or (output_time < dat_time):
-                cfg_data = download_blob(input_container_client, cfg_blob).decode('utf-8')
+                try:
+                    cfg_data = download_blob(input_container_client, cfg_blob).decode('utf-8')
+                except UnicodeDecodeError:
+                    cfg_data = download_blob(input_container_client, cfg_blob).decode('latin-1')
                 dat_data = download_blob(input_container_client, dat_blob_actual)
                 metadata, channels = parse_cfg(cfg_data)
                 data = parse_dat(dat_data, channels, metadata)
