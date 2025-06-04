@@ -32,7 +32,7 @@ def parse_cfg(cfg_content):
             sampling_rates.append((float(parts[0]), int(parts[1])))
     metadata['sampling_rates'] = sampling_rates
 
-    for line in lines[:channel_end + 1]:
+    for line in lines[2:channel_end + 1]:
         parts = line.split(',')
         if parts and parts[0].isdigit():
             # Analog channel
