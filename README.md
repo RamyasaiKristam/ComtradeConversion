@@ -1,23 +1,21 @@
-# Comtrade Blob Converter
+# Comtrade Conversion
 
-This project is designed to read configuration settings from a YAML file, retrieve CFG files from an Azure Blob Storage container, convert the associated data to CSV format, and upload the resulting CSV files to another blob container. 
+This project is designed to read source and destination containers from YAML file, retrieve CFG files from an Azure Blob Storage container, convert the associated data to CSV format, and upload the resulting CSV files to another blob container. 
 
 ## Project Structure
 
 ```
-comtrade_blob_converter
 ├── src
 │   ├── __init__.py
 │   ├── main.py
 │   ├── config.py
 │   ├── blob_utils.py
 │   ├── comtrade_parser.py
-│   └── csv_writer.py
+│   ├── csv_writer.py
+│   └── config.yaml
 ├── requirements.txt
-├── config.yaml
 └── README.md
 ```
-
 ## Installation
 
 To set up the project, follow these steps:
@@ -39,14 +37,15 @@ The project uses a `config.yaml` file to manage configuration settings. Ensure t
 
 - Source blob container name
 - Destination blob container name
-- Any other relevant parameters
+- Any other relevant parameters getting from secrets
 
 ## Usage
 
 To run the application, execute the following command:
 
 ```
-python src/main.py
+cd src
+python main.py
 ```
 
 This will initiate the process of reading the configuration, retrieving CFG files from the specified blob container, converting the data to CSV format, and uploading the CSV files to the destination blob container.
@@ -57,4 +56,4 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under the Ntional Grid License. 
