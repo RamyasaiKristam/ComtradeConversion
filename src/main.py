@@ -12,9 +12,9 @@ import os
 def main():
     # Load configuration
     #config = load_config('../config.yaml')
-    connection_string = os.getenv('AZURE_CONNECTION_STRING', config['blob_storage']['connection_string'])
-    input_container = os.getenv('AZURE_SOURCE_CONTAINER', config['blob_storage']['source_container'])
-    output_container = os.getenv('AZURE_DESTINATION_CONTAINER', config['blob_storage']['destination_container'])
+    connection_string = os.getenv('AZURE_CONNECTION_STRING')
+    input_container = os.getenv('AZURE_SOURCE_CONTAINER')
+    output_container = os.getenv('AZURE_DESTINATION_CONTAINER')
 
     # Set up blob clients
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
