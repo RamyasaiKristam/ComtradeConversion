@@ -1,0 +1,32 @@
+name: Weekly Comtrade Data Processing
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Runs every Sunday at midnight UTC
+  workflow_dispatch:      # Allows manual trigger from GitHub
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run the pipeline
+      env:
+        AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
+        SOURCE_CONTAINER: ${{ secrets.SOURCE_CONTAINER }}
+        DESTINATION_CONTAINER: ${{ secrets.DESTINATION_CONTAINER }}
+      run: |
+        python src/main.py
