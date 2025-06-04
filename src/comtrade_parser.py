@@ -10,56 +10,74 @@ def parse_cfg(cfg_content):
 
     lines = [line.strip() for line in cfg_content.splitlines()]
 
-    # Skip the first 2 lines (header info)
-    channel_lines = lines[2:]
+    # Parse channel count from line 1
+    channel_count_line = lines[1].split(',')
+    total_channels = int(channel_count_line[0])
+    n_analog = int(channel_count_line[1][:-1])  # Remove 'A'
+    n_digital = int(channel_count_line[2][:-1])  # Remove 'D'
 
-    channel_end = 0
-    for i, line in enumerate(channel_lines):
-        parts = line.split(',')
-        if len(parts) >= 3 and parts[0].isdigit():
-            channel_end = i
-    
-    # Adjust for the skipped lines
-    channel_end += 2
+    # Parse channel definitions
+    for i in range(2, 2 + total_channels):
+        parts = lines[i].split(',')
+        if len(parts) >= 6 and i - 2 < n_analog:
+            # Analog channel
+            channels.append({
+                'index': int(parts[0]),
+                'name': parts[1],
+                'phase': parts[2] if len(parts) > 2 else '',
+                'circuit': parts[3] if len(parts) > 3 else '',
+                'unit': parts[4] if len(parts) > 4 else '',
+                'scale': float(parts[5]) if len(parts) > 5 else 1.0,
+                'a': float(parts[5]) if len(parts) > 5 else 1.0,
+                'b': float(parts[6]) if len(parts) > 6 else 0.0,
+                'skew': float(parts[7]) if len(parts) > 7 else 0.0,
+                'min': float(parts[8]) if len(parts) > 8 else None,
+                'max': float(parts[9]) if len(parts) > 9 else None,
+                'primary': float(parts[10]) if len(parts) > 10 else 1.0,
+                'secondary': float(parts[11]) if len(parts) > 11 else 1.0,
+                'ps': parts[12].strip().upper() if len(parts) > 12 else '',
+                'type': 'analog'
+            })
+        elif 3 <= len(parts) <= 5:
+            # Digital channel
+            channels.append({
+                'index': int(parts[0]),
+                'name': parts[1],
+                'unit': parts[2] if len(parts) > 2 else '',
+                'scale': 1.0,
+                'type': 'digital',
+                'normal_state': int(parts[3]) if len(parts) > 3 and parts[3].strip().isdigit() else None,
+                'mask': int(parts[4]) if len(parts) > 4 and parts[4].strip().isdigit() else None
+            })
 
-    total_channels = int(lines[channel_end + 1])
-    nrates = int(lines[channel_end + 2])
+    # The line after the last channel is the number of samples (can be ignored or stored)
+    # The next line is the number of sampling rates
+    nrates = int(lines[2 + total_channels + 1])
     metadata['nrates'] = nrates
 
+    # The next nrates lines are the sampling rates
     for i in range(nrates):
-        parts = lines[channel_end + 3 + i].split(',')
+        parts = lines[2 + total_channels + 2 + i].split(',')
         if len(parts) == 2:
             sampling_rates.append((float(parts[0]), int(parts[1])))
     metadata['sampling_rates'] = sampling_rates
 
-    for line in lines[2:channel_end + 1]:
-        parts = line.split(',')
-        if parts and parts[0].isdigit():
-            # Analog channel
-            if len(parts) >= 6:
-                channels.append({
-                    'index': int(parts[0]),
-                    'name': parts[1],
-                    'unit': parts[4],
-                    'scale': float(parts[5]),
-                    'type': 'analog'
-                })
-                n_analog += 1
-            # Digital channel (handle 3, 4, or 5 fields)
-            elif 3 <= len(parts) <= 5:
-                channels.append({
-                    'index': int(parts[0]),
-                    'name': parts[1],
-                    'unit': parts[2] if len(parts) > 2 else '',
-                    'scale': 1.0,
-                    'type': 'digital'
-                })
-                n_digital += 1
+    # Parse start time (COMTRADE: date,time)
+    try:
+        start_date = lines[2 + total_channels + 2 + nrates].strip()
+        start_time = lines[2 + total_channels + 3 + nrates].strip()
+        dt_str = f"{start_date} {start_time}"
+        try:
+            start_datetime = datetime.strptime(dt_str, "%d/%m/%Y %H:%M:%S.%f")
+        except ValueError:
+            start_datetime = datetime.strptime(dt_str, "%d/%m/%Y %H:%M:%S")
+        metadata['start_datetime'] = start_datetime
+    except Exception:
+        metadata['start_datetime'] = None
 
     metadata['n_analog'] = n_analog
     metadata['n_digital'] = n_digital
     return metadata, channels
-
 
 def parse_dat(dat_content, channels, metadata):
     data = []
@@ -89,7 +107,12 @@ def parse_dat(dat_content, channels, metadata):
             for bit in range(16):
                 digitals.append((word >> bit) & 1)
         digitals = digitals[:n_digital]
-        analog_scaled = [v * ch['scale'] for v, ch in zip(analogs, channels[:n_analog])]
+
+        # Analog scaling with a, b, and primary/secondary if needed
+        analog_scaled = []
+        for v, ch in zip(analogs, channels[:n_analog]):
+            val = ch.get('a', ch.get('scale', 1.0)) * v + ch.get('b', 0.0)
+            analog_scaled.append(val)
 
         # Calculate timestamp if possible
         if start_datetime:
