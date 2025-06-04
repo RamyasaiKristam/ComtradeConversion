@@ -26,7 +26,7 @@ jobs:
     - name: Run the pipeline
       env:
         AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
-        SOURCE_CONTAINER: ${{ secrets.SOURCE_CONTAINER }}
-        DESTINATION_CONTAINER: ${{ secrets.DESTINATION_CONTAINER }}
+        SOURCE_CONTAINER: ${{ secrets.AZURE_SOURCE_CONTAINER }}
+        DESTINATION_CONTAINER: ${{ secrets.AZURE_DESTINATION_CONTAINER }}
       run: |
         python src/main.py
