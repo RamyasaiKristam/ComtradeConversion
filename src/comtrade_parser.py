@@ -13,7 +13,7 @@ def parse_cfg(cfg_content):
     channel_end = 0
     for i, line in enumerate(lines):
         parts = line.split(',')
-        if len(parts) >= 5 and parts[0].isdigit():
+        if len(parts) >= 3 and parts[0].isdigit():
             channel_end = i
 
     total_channels = int(lines[channel_end + 1])
@@ -39,12 +39,12 @@ def parse_cfg(cfg_content):
                     'type': 'analog'
                 })
                 n_analog += 1
-            # Digital channel
-            elif len(parts) == 5:
+            # Digital channel (handle 3, 4, or 5 fields)
+            elif 3 <= len(parts) <= 5:
                 channels.append({
                     'index': int(parts[0]),
                     'name': parts[1],
-                    'unit': '',
+                    'unit': parts[2] if len(parts) > 2 else '',
                     'scale': 1.0,
                     'type': 'digital'
                 })
